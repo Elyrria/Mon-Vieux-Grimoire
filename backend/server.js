@@ -1,5 +1,6 @@
 const http = require("http") // Import du module Node.js
 const app = require("./app") // Import de l'application via le chemin spécifié en argument de require
+const { log } = require("console")
 
 // Fonction qui permet de vérifier si le port est bien un nombre
 const normalizePort = (val) => {
@@ -42,11 +43,29 @@ const server = http.createServer(app) // Création du serveur et on lui passe l'
 
 server.on("error", errorHandler) // Au démarrage du serveur, gestion de l'erreur s'il y en a
 server.on("listening", () => {
+    const portEmot = {
+        0: "0️⃣",
+        1: "1️⃣",
+        2: "2️⃣",
+        3: "3️⃣",
+        4: "4️⃣",
+        5: "5️⃣",
+        6: "6️⃣",
+        7: "7️⃣",
+        8: "8️⃣",
+        9: "9️⃣",
+    }
+
+    const portSplit = port
+        .toString()
+        .split("")
+        .map((digit) => portEmot[digit]).join()
+
     const address = server.address() // Récupération de l'adresse du serveur et stockage dans la constante address
     const bind =
-        typeof address === "string" ? `pipe ${address}` : `port ${port}`
-    console.log("Server start")
-    console.log(`Listening on ${bind}`) // À l'écoute du serveur, permet d'afficher dans la console l'adresse du serveur
+        typeof address === "string" ? `pipe ${address}` : `port ${portSplit}`
+    console.log("Server start 🛫")
+    console.log(`Listening 👂 on ${bind}`) // À l'écoute du serveur, permet d'afficher dans la console l'adresse du serveur
 })
 
 server.listen(port) // Serveur écoute sur le port 3000 ou sur l'environnement passé par le serveur de production
