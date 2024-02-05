@@ -1,8 +1,8 @@
 const express = require("express") // Import du framework express
 const mongoose = require("mongoose") // Import du paquet mongoose
-const Book = require("./models/Book") // Import du schéma Book depuis le chemin spécifié
 const bookRoutes = require("./router/books")
-const userRoutes = require("./router/books")
+const userRoutes = require("./router/user")
+
 const app = express() // Conversion du module app en une application express
 
 mongoose
@@ -31,7 +31,7 @@ app.use((req, res, next) => {
     next()
 })
 
+app.use("/api/books", bookRoutes) //! => Routes books
 app.use("/api/auth", userRoutes) //! => Routes utilisateur
-app.use("/api/books", bookRoutes)//! => Routes books
 
 module.exports = app // Export du module app
