@@ -55,11 +55,12 @@ server.on("listening", () => {
         8: "8️⃣",
         9: "9️⃣",
     }
-
+    // Permet de modifier le numéro du port en plusieurs émoticônes
     const portSplit = port
         .toString()
         .split("")
-        .map((digit) => portEmot[digit]).join()
+        .map((digit) => portEmot[digit])
+        .join("  ")
 
     const address = server.address() // Récupération de l'adresse du serveur et stockage dans la constante address
     const bind =

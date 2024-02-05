@@ -1,8 +1,9 @@
-const express = require("express")
-const mongoose = require("mongoose")
-const Book = require("./models/book")
-
-const app = express()
+const express = require("express") // Import du framework express
+const mongoose = require("mongoose") // Import du paquet mongoose
+const Book = require("./models/Book") // Import du schéma Book depuis le chemin spécifié
+const bookRoutes = require("./router/books")
+const userRoutes = require("./router/books")
+const app = express() // Conversion du module app en une application express
 
 mongoose
     .connect(
@@ -14,51 +15,23 @@ mongoose
     .catch(() => {
         console.log("Connexion à la base de données MongoDB échouée 😩")
     })
-// Permet de récupérer dans la réquète (req) le body au format JSON et de l'envoyer comme réponse (res)
-app.use(express.json())
+
+app.use(express.json()) // Permet de récupérer le corps de la requête (req) au format JSON et de l'envoyer comme réponse (res)
 
 app.use((req, res, next) => {
-    res.setHeader("Access-Control-Allow-Origin", "*") // Permet d'accèder à l'API depuis n'importe quelle origine
+    res.setHeader("Access-Control-Allow-Origin", "*") // Permet d'accéder à l'API depuis n'importe quelle origine
     res.setHeader(
         "Access-Control-Allow-Headers",
         "Origin, X-Requested-With, Content, Accept, Content-Type, Authorization"
-    ) // Permet d'ajouter tous les headers mentionnés aux requêtes vers l'API
+    ) // Permet d'ajouter tous les en-têtes mentionnés aux requêtes vers l'API
     res.setHeader(
         "Access-Control-Allow-Methods",
         "GET, POST, PUT, DELETE, PATCH, OPTIONS"
-    ) // Permet d'envoyer des rêquetes avec les méthodes mentionnées
+    ) // Permet d'envoyer des requêtes avec les méthodes mentionnées
     next()
 })
 
-app.post("/api/books", (req, res, next) => {
-    const book = new Book({ ...req.body })
-    book.save()
-        .then(() => {
-            res.status(201).json({ message: "Objet créé !", objet: req.body })
-        })
-        .catch((error) => {
-            res.status(400).json({ error })
-        })
-})
+app.use("/api/auth", userRoutes) //! => Routes utilisateur
+app.use("/api/books", bookRoutes)//! => Routes books
 
-app.get("/api/books", (req, res, next) => {
-    Book.find()
-        .then((book) => {
-            res.status(200).json(book)
-        })
-        .catch((error) => {
-            res.status(400).json({ error })
-        })
-})
-
-app.get("/api/books/:id", (req, res, next) => {
-    Book.findOne({ _id: req.params.id })
-        .then((book) => {
-            res.status(200).json(book)
-        })
-        .catch((error) => {
-            res.status(404).json({ error })
-        })
-})
-
-module.exports = app
+module.exports = app // Export du module app
