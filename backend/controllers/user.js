@@ -53,8 +53,8 @@ exports.login = (req, res, next) => {
                                 //Génération d'un token graçe au paquet jwt et sa méthode sign() qui prend trois arguments (1er userId, la clé de décodage, et le délai d'expiration)
                                 token: jwt.sign(
                                     { userId: user._id },
-                                    "RANDOM_TOKEN_SECRET",
-                                    { expiresIn: "2h" }
+                                    process.env.TOKEN_SECRET,
+                                    { expiresIn: "24h" }
                                 ),
                             })
                         }

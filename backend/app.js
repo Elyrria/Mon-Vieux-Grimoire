@@ -1,16 +1,18 @@
 const express = require("express") // Import du framework express
+const path = require("path")
 const mongoose = require("mongoose") // Import du paquet mongoose
 const swaggerUi = require("swagger-ui-express") // Import du paquer swaggerUi
 const yaml = require("yamljs") // Import du paquet yamljs
 const bookRoutes = require("./router/books")
 const userRoutes = require("./router/user")
 const swaggerDocs = yaml.load("swagger.yaml")
+require("dotenv").config() // Permet de charger les variables d'environnement
 
 const app = express() // Conversion du module app en une application express
 
 mongoose
     .connect(
-        "mongodb+srv://Henri:PdYfyDDy4wYLLtbq@cluster0.ilitkr1.mongodb.net/?retryWrites=true&w=majority"
+        `mongodb+srv://Henri:${process.env.MONGODB_SECRET}@cluster0.ilitkr1.mongodb.net/?retryWrites=true&w=majority`
     )
     .then(() => {
         console.log("Connexion à la base de données MongoDB réussie ✅💪")
@@ -37,5 +39,6 @@ app.use((req, res, next) => {
 app.use("/api/books", bookRoutes) //! => Routes books
 app.use("/api/auth", userRoutes) //! => Routes utilisateur
 app.use("/api/docs", swaggerUi.serve, swaggerUi.setup(swaggerDocs)) //! => Routes vers la documentation de l'API
+app.use("/images", express.static(path.join(__dirname, "images")))
 
 module.exports = app // Export du module app
