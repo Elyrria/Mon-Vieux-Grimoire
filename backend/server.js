@@ -1,6 +1,5 @@
 const http = require("http") // Import du module Node.js
 const app = require("./app") // Import de l'application via le chemin spécifié en argument de require
-const { log } = require("console")
 
 // Fonction qui permet de vérifier si le port est bien un nombre
 const normalizePort = (val) => {

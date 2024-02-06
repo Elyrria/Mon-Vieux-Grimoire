@@ -1,7 +1,10 @@
 const express = require("express") // Import du framework express
 const mongoose = require("mongoose") // Import du paquet mongoose
+const swaggerUi = require("swagger-ui-express") // Import du paquer swaggerUi
+const yaml = require("yamljs") // Import du paquet yamljs
 const bookRoutes = require("./router/books")
 const userRoutes = require("./router/user")
+const swaggerDocs = yaml.load("swagger.yaml")
 
 const app = express() // Conversion du module app en une application express
 
@@ -33,5 +36,6 @@ app.use((req, res, next) => {
 
 app.use("/api/books", bookRoutes) //! => Routes books
 app.use("/api/auth", userRoutes) //! => Routes utilisateur
+app.use("/api/docs", swaggerUi.serve, swaggerUi.setup(swaggerDocs)) //! => Routes vers la documentation de l'API
 
 module.exports = app // Export du module app

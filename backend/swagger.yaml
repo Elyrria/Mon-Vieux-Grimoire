@@ -1,0 +1,276 @@
+---
+openapi: 3.0.0
+info:
+  title: Mon Vieux Grimoire API
+  description: |
+    API du site Mon Vieux Grimoire. Ici on retrouvera les différentes routes pour la récupération/modification/suppression d'un livre. Mais aussi pour l'authentification.
+  contact:
+    email: quentindumon352a@gmail.com
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  version: 1.0.0
+servers:
+- url: https://virtserver.swaggerhub.com/QUENTINDUMON352A/MonVieuxGrimoire/1.0.0
+  description: SwaggerHub API Auto Mocking
+- url: http://localhost:4000
+tags:
+- name: books
+  description: Tous à-propos des livres
+- name: user
+  description: Opération à-propos des utilisateurs
+paths:
+  /api/books:
+    get:
+      tags:
+      - books
+      summary: Récupèration de tous les livres 📚
+      description: Récupération de tous les livres depuis la base de données 🛜
+      operationId: findBooks
+      responses:
+        "200":
+          description: Opération réussite ✅
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/inline_response_200'
+        "400":
+          description: Requête invalide ❌
+    post:
+      tags:
+      - books
+      summary: Ajout d'un nouveau livre 👌
+      description: Permet de rajouter un livre dans la base de données avec les éléments fourni dans le body de la requête 📖
+      operationId: addBook
+      parameters:
+      - name: token
+        in: header
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/api_books_body'
+        required: true
+      responses:
+        "201":
+          description: Livre créée ✅
+        "400":
+          description: Requête invalide ⛔️
+        "401":
+          description: Droits refusés 🛑️
+        "404":
+          description: Livre non trouvé 🤷‍♂
+  /api/books/:id:
+    put:
+      tags:
+      - books
+      summary: Mise à jour d'un livre existant ♻️
+      description: Permet de mettre à jour le livre spécifié dans les paramètres ⚙️⚙️⚙️ de la requète 👌
+      operationId: updateBook
+      parameters:
+      - name: token
+        in: header
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/books_id_body'
+        required: true
+      responses:
+        "200":
+          description: Réquête réussie ✅
+        "400":
+          description: Bad Request ⛔️
+        "401":
+          description: Droits refusés 🛑️
+        "404":
+          description: Livre non trouvé 🤷‍♂
+      security:
+      - bearerAuth: []
+    delete:
+      tags:
+      - books
+      summary: Suppression d'un livre 🛑
+      description: Permet de supprimer un livre avec l'id passé en paramètres ⚙️⚙️⚙️ de la requête ❌
+      operationId: deleteBook
+      parameters:
+      - name: token
+        in: header
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      responses:
+        "200":
+          description: Réquête réussie ✅
+        "400":
+          description: Requête invalide ⛔️
+        "401":
+          description: Droits refusés 🛑️
+        "404":
+          description: Livre non trouvé 🤷‍♂
+  /api/books/:id/rating:
+    post:
+      tags:
+      - books
+      summary: Atribue une note au livre 📕
+      description: Permet d'attribuer une note au livre passé en id dans les paramètres ⚙️⚙️⚙️ de la requête 💯
+      operationId: ratingBook
+      parameters:
+      - name: token
+        in: header
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      responses:
+        "201":
+          description: Note créée ✅
+        "400":
+          description: Requête invalide ⛔️
+        "401":
+          description: Droits refusés 🛑️
+        "404":
+          description: Livre non trouvé 🤷‍♂
+  /api/books/bestrating:
+    get:
+      tags:
+      - books
+      summary: Récupération des trois livres les mieux notés 📗
+      description: Permet de récupérer les trois livres ayant la meilleur moyenne 💯
+      operationId: bestRatingBook
+      responses:
+        "200":
+          description: Réquête réussie ✅
+        "400":
+          description: Requête invalide ⛔️
+  /api/auth/signup:
+    post:
+      tags:
+      - user
+      summary: Création d'utilisateur 👨‍💻
+      description: Route permettant d'enregistrer un utilisateur dans la base de données avec l'email et le password dans les paramètres ⚙️⚙️⚙️ de la requête 🛣 ️
+      operationId: createUser
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/auth_signup_body'
+        required: true
+      responses:
+        "201":
+          description: Utilisateur créé ✅
+        "400":
+          description: Requête invalide ⛔️
+        "500":
+          description: Erreur serveur ⛔️
+  /api/auth/login:
+    post:
+      tags:
+      - user
+      summary: Connexion utilisateur 👨‍💻
+      description: Permet de se connecter et de récupérer le token de connexion dans la réponse 👌
+      operationId: loginUser
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/auth_login_body'
+        required: true
+      responses:
+        "200":
+          description: Opération réussite ✅
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/inline_response_200_1'
+        "401":
+          description: Paire identifiant/mot de passe inccorrecte 🛑
+components:
+  schemas:
+    books_id_body:
+      type: object
+      properties:
+        title:
+          type: string
+        author:
+          type: string
+        imageUrl:
+          type: string
+        year:
+          type: integer
+        genre:
+          type: string
+        rating:
+          type: number
+    api_books_body:
+      type: object
+      properties:
+        title:
+          type: string
+        author:
+          type: string
+        imageUrl:
+          type: string
+        year:
+          type: integer
+        genre:
+          type: string
+        ratings:
+          type: array
+          items:
+            type: number
+    inline_response_200_1:
+      type: object
+      properties:
+        userId:
+          type: string
+        token:
+          type: string
+    inline_response_200:
+      type: object
+      properties:
+        title:
+          type: string
+        author:
+          type: string
+        imageUrl:
+          type: string
+        year:
+          type: integer
+        genre:
+          type: string
+        ratings:
+          type: array
+          items:
+            type: number
+    auth_login_body:
+      type: object
+      properties:
+        email:
+          type: string
+        password:
+          type: string
+    auth_signup_body:
+      type: object
+      properties:
+        email:
+          type: string
+        password:
+          type: string
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer

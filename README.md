@@ -15,3 +15,9 @@ Le projet a été testé sur node 19.
 #### Avec npm
 
 Faites la commande `npm install` pour installer les dépendances puis `nodemon` pour lancer le serveur.
+
+```
+Lien pour voir la
+[documentation de l'API avec Swagger](http://localhost:4000/docs/)
+
+Pour lire la documentation, utiliser Chrome ou Firefox
