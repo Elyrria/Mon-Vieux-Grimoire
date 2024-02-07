@@ -6,9 +6,15 @@ const multer = require("../middlewares/multer-config") // Import du module multe
 const router = express.Router()
 
 //! Authentification requise
-router.post("/", auth, multer, bookCtrl.createBook) // Route pour créer un livre
+router.post(
+    "/",
+    auth,
+    multer.upload.single("image"),
+    multer.processImage,
+    bookCtrl.createBook
+) // Route pour créer un livre
 //! Authentification requise
-router.put("/:id", auth, multer, bookCtrl.modifyOneBook) // Route qui permet de modifier un livre
+router.put("/:id", auth, bookCtrl.modifyOneBook) // Route qui permet de modifier un livre
 //! Authentification requise
 router.delete("/:id", auth, bookCtrl.deleteOneBook) // Route qui permet de supprimer un livre
 //! Authentification requise
