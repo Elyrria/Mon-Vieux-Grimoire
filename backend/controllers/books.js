@@ -1,3 +1,4 @@
+const { error } = require("console")
 const Book = require("../models/Book") // Import du schéma Book depuis le chemin spécifié
 const fs = require("fs")
 // Middleware pour la création d'un livre
@@ -73,14 +74,45 @@ exports.modifyOneBook = (req, res, next) => {
             }
         })
         .catch((error) => {
-            res.status(400).json({ error })
+            res.status(500).json({ error })
         })
 }
 
 // Middleware pour supprimer un livre avec son :id passé en paramètre de la requête
 exports.deleteOneBook = (req, res, next) => {
-    //! Implémenter la logique de suppression ici
     // Méthode deleteOne()
+    Book.findOne({ _id: req.params.id })
+        .then((book) => {
+            if (book.userId !== req.auth.userId) {
+                res.status(401).json({
+                    message: "Accès refusé",
+                })
+            } else {
+                const fileName = book.imageUrl.split("/images/")[1] // Nom du fichier à supprimer
+                // On le suppirme avec la méthode unlink de fs
+                fs.unlink(`images/${fileName}`, (error) => {
+                    if (error) {
+                        console.error(
+                            "Erreur lors de la suppression du fichier",
+                            error
+                        )
+                    } else {
+                        Book.deleteOne({ _id: req.params.id })
+                            .then(() => {
+                                res.status(200).json({
+                                    message: "Livre supprimé !",
+                                })
+                            })
+                            .catch((error) => {
+                                res.status(400).json({ error })
+                            })
+                    }
+                })
+            }
+        })
+        .catch((error) => {
+            res.status(500).json({ error })
+        })
 }
 
 // Middleware pour l'attribution d'une note
