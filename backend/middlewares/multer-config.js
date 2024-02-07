@@ -18,7 +18,7 @@ const upload = multer({
 // Middleware pour traiter l'image téléchargée et la convertir en .webp
 async function processImage(req, res, next) {
     if (!req.file) {
-        return res.status(400).json({ message: "Aucune image sélectionnée." })
+        return next()
     }
 
     const { buffer, originalname } = req.file // Destructuration pour récupérer deux variables : buffer et originalname récupéraient depuis l'objet req.file

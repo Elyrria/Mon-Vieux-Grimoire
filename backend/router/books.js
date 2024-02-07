@@ -14,7 +14,13 @@ router.post(
     bookCtrl.createBook
 ) // Route pour créer un livre
 //! Authentification requise
-router.put("/:id", auth, bookCtrl.modifyOneBook) // Route qui permet de modifier un livre
+router.put(
+    "/:id",
+    auth,
+    multer.upload.single("image"),
+    multer.processImage,
+    bookCtrl.modifyOneBook
+) // Route qui permet de modifier un livre
 //! Authentification requise
 router.delete("/:id", auth, bookCtrl.deleteOneBook) // Route qui permet de supprimer un livre
 //! Authentification requise
@@ -24,3 +30,4 @@ router.get("/:id", bookCtrl.getOneBook) // Route pour récupérer un seul livre 
 router.get("/bestrating", bookCtrl.getBestRating) // Route qui permet de récupérer les 3 livres ayant la meilleure moyenne
 
 module.exports = router
+

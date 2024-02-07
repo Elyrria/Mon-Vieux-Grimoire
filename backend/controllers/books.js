@@ -1,5 +1,5 @@
 const Book = require("../models/Book") // Import du schéma Book depuis le chemin spécifié
-
+const fs = require("fs")
 // Middleware pour la création d'un livre
 exports.createBook = (req, res, next) => {
     const bookObject = JSON.parse(req.body.book)
@@ -18,15 +18,63 @@ exports.createBook = (req, res, next) => {
             res.status(201).json({ message: "Objet créé !", objet: req.body })
         })
         .catch((error) => {
-            console.log(error)
             res.status(400).json({ error })
         })
 }
 
 // Middleware pour modifier un livre avec son :id passé en paramètre de la requête
 exports.modifyOneBook = (req, res, next) => {
-    //! Implémenter la logique de modification ici
-    // Méthode updateOne()
+    const bookObject = req.file
+        ? {
+              // Requête avec fichier
+              ...JSON.parse(req.body.book),
+              imageUrl: `${req.protocol}://${req.get("host")}/images/${
+                  req.file.filename
+              }`,
+          }
+        : { ...req.body } // requête dans fichier
+
+    delete bookObject.userId // Suppression du userId pour des raisons de sécurité
+
+    Book.findOne({ _id: req.params.id })
+        .then((book) => {
+            // Vérification que l'utilisateur qui essaye de modifier correspond bien à l'utilisateur authentifié
+            if (book.userId !== req.auth.userId) {
+                res.status(401).json({
+                    message: "Accès refusé",
+                })
+            } else {
+                // Si fichier existant
+                if (req.file) {
+                    const filepath = // Chemin du fichier à supprimer
+                        __dirname +
+                        `/../images/${book.imageUrl.split("/images/")[1]}`
+                    // On le suppirme avec la méthode unlink de fs
+                    fs.unlink(filepath, (error) => {
+                        if (error) {
+                            console.error(
+                                "Erreur lors de la suppression du fichier précédent",
+                                error
+                            )
+                        }
+                    })
+                }
+                // Mise à jour avec les données récupérées de la requête
+                Book.updateOne(
+                    { _id: req.params.id }, // Le livre à modifier
+                    { ...bookObject, _id: req.params.id } // Les données de modification
+                )
+                    .then(() => {
+                        res.status(200).json({ message: "Livre modifié !" })
+                    })
+                    .catch((error) => {
+                        res.status(400).json({ error })
+                    })
+            }
+        })
+        .catch((error) => {
+            res.status(400).json({ error })
+        })
 }
 
 // Middleware pour supprimer un livre avec son :id passé en paramètre de la requête
