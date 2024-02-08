@@ -220,6 +220,34 @@ paths:
             responses:
                 "201":
                     description: Note créée ✅
+                    content:
+                        application/json:
+                            schema:
+                                type: object
+                                properties:
+                                    userId:
+                                        type: string
+                                    title:
+                                        type: string
+                                    author:
+                                        type: string
+                                    imageUrl:
+                                        type: string
+                                    year:
+                                        type: integer
+                                    genre:
+                                        type: string
+                                    ratings:
+                                        type: array
+                                        items:
+                                            type: object
+                                            properties:
+                                                userId:
+                                                    type: string
+                                                grade:
+                                                    type: number
+                                    averageRating:
+                                        type: number
                 "400":
                     description: Requête invalide ⛔️
                 "401":

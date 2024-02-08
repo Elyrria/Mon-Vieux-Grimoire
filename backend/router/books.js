@@ -25,8 +25,8 @@ router.put(
 router.delete("/:id", auth, bookCtrl.deleteOneBook) // Route qui permet de supprimer un livre
 //! Authentification requise
 router.post("/:id/rating", auth, bookCtrl.createRating) // Route qui permet d'ajouter une note à un livre
+router.get("/bestrating", bookCtrl.getBestRating) // Route qui permet de récupérer les 3 livres ayant la meilleure moyenne
 router.get("/", bookCtrl.getAllBooks) // Route pour récupérer tous les livres
 router.get("/:id", bookCtrl.getOneBook) // Route pour récupérer un seul livre grâce à son id
-router.get("/bestrating", bookCtrl.getBestRating) // Route qui permet de récupérer les 3 livres ayant la meilleure moyenne
 
 module.exports = router

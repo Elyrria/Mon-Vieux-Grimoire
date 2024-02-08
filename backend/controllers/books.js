@@ -18,7 +18,7 @@ exports.createBook = (req, res, next) => {
             res.status(201).json({ message: "Objet créé !", objet: req.body })
         })
         .catch((error) => {
-            res.status(400).json({ error })
+            res.status(500).json({ error })
         })
 }
 
@@ -32,13 +32,13 @@ exports.modifyOneBook = (req, res, next) => {
                   req.file.filename
               }`,
           }
-        : { ...req.body } // requête dans fichier
+        : { ...req.body } // Requête sans fichier
 
     delete bookObject.userId // Suppression du userId pour des raisons de sécurité
 
     Book.findOne({ _id: req.params.id })
         .then((book) => {
-            // Vérification que l'utilisateur qui essaye de modifier correspond bien à l'utilisateur authentifié
+            // Vérification que l'utilisateur qui essaie de modifier correspond bien à l'utilisateur authentifié
             if (book.userId !== req.auth.userId) {
                 return res.status(401).json({
                     message: "Accès refusé",
@@ -49,7 +49,7 @@ exports.modifyOneBook = (req, res, next) => {
                     const filepath = // Chemin du fichier à supprimer
                         __dirname +
                         `/../images/${book.imageUrl.split("/images/")[1]}`
-                    // On le suppirme avec la méthode unlink de fs
+                    // On le supprime avec la méthode unlink de fs
                     fs.unlink(filepath, (error) => {
                         if (error) {
                             console.error(
@@ -68,12 +68,12 @@ exports.modifyOneBook = (req, res, next) => {
                         res.status(200).json({ message: "Livre modifié !" })
                     })
                     .catch((error) => {
-                        res.status(400).json({ error })
+                        res.status(500).json({ error })
                     })
             }
         })
         .catch((error) => {
-            res.status(500).json({ error })
+            res.status(400).json({ error })
         })
 }
 
@@ -87,7 +87,7 @@ exports.deleteOneBook = (req, res, next) => {
                 })
             } else {
                 const fileName = book.imageUrl.split("/images/")[1] // Nom du fichier à supprimer
-                // On le suppirme avec la méthode unlink de fs
+                // On le supprime avec la méthode unlink de fs
                 fs.unlink(`images/${fileName}`, (error) => {
                     if (error) {
                         console.error(
@@ -109,7 +109,7 @@ exports.deleteOneBook = (req, res, next) => {
             }
         })
         .catch((error) => {
-            res.status(500).json({ error })
+            res.status(400).json({ error })
         })
 }
 
@@ -154,7 +154,7 @@ exports.createRating = (req, res, next) => {
                 })
         })
         .catch((error) => {
-            res.status(500).json({ error })
+            res.status(400).json({ error })
         })
 }
 
@@ -182,5 +182,16 @@ exports.getOneBook = (req, res, next) => {
 
 // Middleware pour la récupération des trois livres qui ont la meilleure note
 exports.getBestRating = (req, res, next) => {
-    //! Implémenter la logique de récupération des meilleurs livres ici
+    Book.find()
+        .then((books) => {
+            // On trie le tableau par ordre croissant
+            const sortBooks = books.sort(
+                (a, b) => b.averageRating - a.averageRating
+            )
+            const topThreeBooks = sortBooks.slice(0, 3) // On récupère les 3 premiers éléments du tableau
+            res.status(200).json(topThreeBooks)
+        })
+        .catch((error) => {
+            res.status(400).json({ error })
+        })
 }
