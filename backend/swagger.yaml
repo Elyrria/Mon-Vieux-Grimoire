@@ -152,7 +152,7 @@ paths:
                 "200":
                     description: Réquête réussie ✅
                 "400":
-                    description: Bad Request ⛔️
+                    description: Requête invalide ⛔️
                 "401":
                     description: Droits refusés 🛑️
                 "404":

@@ -1,4 +1,3 @@
-const { error } = require("console")
 const Book = require("../models/Book") // Import du schéma Book depuis le chemin spécifié
 const fs = require("fs")
 // Middleware pour la création d'un livre
@@ -41,7 +40,7 @@ exports.modifyOneBook = (req, res, next) => {
         .then((book) => {
             // Vérification que l'utilisateur qui essaye de modifier correspond bien à l'utilisateur authentifié
             if (book.userId !== req.auth.userId) {
-                res.status(401).json({
+                return res.status(401).json({
                     message: "Accès refusé",
                 })
             } else {
@@ -80,11 +79,10 @@ exports.modifyOneBook = (req, res, next) => {
 
 // Middleware pour supprimer un livre avec son :id passé en paramètre de la requête
 exports.deleteOneBook = (req, res, next) => {
-    // Méthode deleteOne()
     Book.findOne({ _id: req.params.id })
         .then((book) => {
             if (book.userId !== req.auth.userId) {
-                res.status(401).json({
+                return res.status(401).json({
                     message: "Accès refusé",
                 })
             } else {
@@ -117,8 +115,47 @@ exports.deleteOneBook = (req, res, next) => {
 
 // Middleware pour l'attribution d'une note
 exports.createRating = (req, res, next) => {
-    //! Implémenter la logique d'attribution de note ici
-    // Méthode save()
+    delete req.body.userId // Suppression du userId de la requête
+    Book.findOne({ _id: req.params.id })
+        .then((book) => {
+            if (!book) {
+                return res.status(404).json({ message: "Livre non trouvé" })
+            }
+            const alreadyRating = book.ratings.some((rating) => {
+                return rating.userId === req.auth.userId
+            })
+            // Vérification si l'utilisateur a déjà attribué une note
+            if (alreadyRating) {
+                return res.status(401).json({
+                    message: "Une note a déjà été attribuée",
+                })
+            }
+
+            // On met à jour le livre avec le userId et la note de l'utilisateur
+            book.ratings.push({
+                userId: req.auth.userId,
+                grade: req.body.rating,
+            })
+            const numberOfRating = book.ratings.length
+            const totalOfNotes = book.ratings.reduce(
+                (acc, rating) => acc + rating.grade,
+                0
+            )
+            const newAverageRating = (totalOfNotes / numberOfRating).toFixed(2)
+
+            book.averageRating = newAverageRating
+
+            book.save()
+                .then((book) => {
+                    res.status(201).json(book)
+                })
+                .catch((error) => {
+                    res.status(500).json({ error })
+                })
+        })
+        .catch((error) => {
+            res.status(500).json({ error })
+        })
 }
 
 // Middleware pour la récupération de tous les livres
